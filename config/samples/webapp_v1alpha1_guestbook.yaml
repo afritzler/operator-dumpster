@@ -1,0 +1,6 @@
+apiVersion: webapp.afritzler.github.io/v1alpha1
+kind: Guestbook
+metadata:
+  name: guestbook-sample
+spec:
+  # TODO(user): Add fields here
