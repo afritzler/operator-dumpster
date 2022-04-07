@@ -17,40 +17,44 @@ limitations under the License.
 package batch
 
 import (
-	"path/filepath"
-	"testing"
-
-	. "github.com/onsi/ginkgo"
+	"context"
+	batchv1alpha1 "github.com/afritzler/operator-dumpster/apis/batch/v1alpha1"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
+	"path/filepath"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-
-	batchv1alpha1 "github.com/afritzler/operator-dumpster/apis/batch/v1alpha1"
+	"testing"
 	//+kubebuilder:scaffold:imports
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
-var cfg *rest.Config
-var k8sClient client.Client
-var testEnv *envtest.Environment
+var (
+	cfg       *rest.Config
+	ctx       = ctrl.SetupSignalHandler()
+	k8sClient client.Client
+	testEnv   *envtest.Environment
+)
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
-	RunSpecsWithDefaultAndCustomReporters(t,
-		"Controller Suite",
-		[]Reporter{printer.NewlineReporter{}})
+	RunSpecs(t, "Controller Suite")
 }
 
 var _ = BeforeSuite(func() {
 	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
+
+	var err error
 
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
@@ -58,7 +62,7 @@ var _ = BeforeSuite(func() {
 		ErrorIfCRDPathMissing: true,
 	}
 
-	cfg, err := testEnv.Start()
+	cfg, err = testEnv.Start()
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
@@ -71,10 +75,52 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
-}, 60)
+})
+
+// SetupTest returns a namespace which will be created before each ginkgo `It` block and deleted at the end of `It`
+// so that each test case can run in an independent way
+func SetupTest(ctx context.Context) *corev1.Namespace {
+	var (
+		cancel context.CancelFunc
+	)
+	ns := &corev1.Namespace{}
+
+	BeforeEach(func() {
+		var mgrCtx context.Context
+		mgrCtx, cancel = context.WithCancel(ctx)
+		*ns = corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "testns-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
+
+		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
+			Scheme: scheme.Scheme,
+		})
+		Expect(err).ToNot(HaveOccurred())
+
+		// register reconciler here
+		Expect((&CronJobReconciler{
+			Client: k8sManager.GetClient(),
+			Scheme: k8sManager.GetScheme(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		go func() {
+			defer GinkgoRecover()
+			Expect(k8sManager.Start(mgrCtx)).ToNot(HaveOccurred(), "failed to run manager")
+		}()
+	})
+
+	AfterEach(func() {
+		cancel()
+		Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
+	})
+
+	return ns
+}
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
-	err := testEnv.Stop()
-	Expect(err).NotTo(HaveOccurred())
+	Expect(testEnv.Stop()).NotTo(HaveOccurred())
 })
