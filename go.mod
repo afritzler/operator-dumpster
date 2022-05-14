@@ -3,7 +3,7 @@ module github.com/afritzler/operator-dumpster
 go 1.17
 
 require (
-	github.com/onmetal/controller-utils v0.5.2
+	github.com/onmetal/controller-utils v0.6.0
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.19.0
 	github.com/robfig/cron v1.2.0
