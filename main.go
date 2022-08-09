@@ -19,24 +19,19 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/onmetal/controller-utils/cmdutils/switches"
 	"os"
 
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	// to ensure that exec-entrypoint and run can make use of them.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
-
+	batchv1alpha1 "github.com/afritzler/operator-dumpster/apis/batch/v1alpha1"
+	webappv1alpha1 "github.com/afritzler/operator-dumpster/apis/webapp/v1alpha1"
+	batchcontrollers "github.com/afritzler/operator-dumpster/controllers/batch"
+	webappcontrollers "github.com/afritzler/operator-dumpster/controllers/webapp"
+	"github.com/onmetal/controller-utils/cmdutils/switches"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-
-	batchv1alpha1 "github.com/afritzler/operator-dumpster/apis/batch/v1alpha1"
-	webappv1alpha1 "github.com/afritzler/operator-dumpster/apis/webapp/v1alpha1"
-	batchcontrollers "github.com/afritzler/operator-dumpster/controllers/batch"
-	webappcontrollers "github.com/afritzler/operator-dumpster/controllers/webapp"
 	//+kubebuilder:scaffold:imports
 )
 
