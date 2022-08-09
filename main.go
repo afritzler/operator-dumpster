@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -26,6 +27,7 @@ import (
 	batchcontrollers "github.com/afritzler/operator-dumpster/controllers/batch"
 	webappcontrollers "github.com/afritzler/operator-dumpster/controllers/webapp"
 	"github.com/onmetal/controller-utils/cmdutils/switches"
+	"github.com/zcalusic/sysinfo"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -56,11 +58,13 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
+	var ensureLibvirt bool
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
+	flag.BoolVar(&ensureLibvirt, "ensure-libvirt", false, "Ensure that Libvirt is installed on the host.")
 
 	webhooks := switches.New(cronJobWebhook)
 	flag.Var(webhooks, "webhooks", fmt.Sprintf("Webhooks to enable. All webhooks: %v. Disabled-by-default webhooks: %v", webhooks.All(), webhooks.DisabledByDefault()))
@@ -72,6 +76,20 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+
+	if ensureLibvirt {
+		var si sysinfo.SysInfo
+
+		si.GetSysInfo()
+
+		data, err := json.MarshalIndent(&si, "", "  ")
+		if err != nil {
+			setupLog.Error(err, "unable to get sysinfo")
+			os.Exit(1)
+		}
+
+		fmt.Println(string(data))
+	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
