@@ -18,16 +18,16 @@ package batch
 
 import (
 	"context"
+	"time"
+
 	batchv1alpha1 "github.com/afritzler/operator-dumpster/apis/batch/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	batchv1beta1 "k8s.io/api/batch/v1beta1"
-
 	batchv1 "k8s.io/api/batch/v1"
+	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"time"
 )
 
 var _ = Describe("CronJob controller", func() {
