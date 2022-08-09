@@ -3,7 +3,7 @@ module github.com/afritzler/operator-dumpster
 go 1.19
 
 require (
-	github.com/onmetal/controller-utils v0.6.2
+	github.com/onmetal/controller-utils v0.6.3
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.20.0
 	github.com/robfig/cron v1.2.0
@@ -63,8 +63,8 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.24.2 // indirect
-	k8s.io/component-base v0.24.2 // indirect
+	k8s.io/apiextensions-apiserver v0.24.3 // indirect
+	k8s.io/component-base v0.24.3 // indirect
 	k8s.io/klog/v2 v2.60.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20220401212409-b28bf2818661 // indirect
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9 // indirect
