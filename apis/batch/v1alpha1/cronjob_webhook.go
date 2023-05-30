@@ -26,6 +26,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 // log is for logging in this package.
@@ -66,24 +67,30 @@ func (r *CronJob) Default() {
 var _ webhook.Validator = &CronJob{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *CronJob) ValidateCreate() error {
+func (r *CronJob) ValidateCreate() (admission.Warnings, error) {
 	cronjoblog.Info("validate create", "name", r.Name)
 
-	return r.validateCronJob()
+	var warnings admission.Warnings
+
+	return warnings, r.validateCronJob()
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *CronJob) ValidateUpdate(old runtime.Object) error {
+func (r *CronJob) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	cronjoblog.Info("validate update", "name", r.Name)
 
-	return r.validateCronJob()
+	var warnings admission.Warnings
+
+	return warnings, r.validateCronJob()
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *CronJob) ValidateDelete() error {
+func (r *CronJob) ValidateDelete() (admission.Warnings, error) {
 	cronjoblog.Info("validate delete", "name", r.Name)
 
-	return r.validateCronJob()
+	var warnings admission.Warnings
+
+	return warnings, r.validateCronJob()
 }
 
 func (r *CronJob) validateCronJob() error {
