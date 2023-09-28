@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/onmetal/controller-utils v0.8.2
 	github.com/onsi/ginkgo/v2 v2.12.1
-	github.com/onsi/gomega v1.27.10
+	github.com/onsi/gomega v1.28.0
 	github.com/robfig/cron v1.2.0
 	k8s.io/api v0.28.2
 	k8s.io/apimachinery v0.28.2
