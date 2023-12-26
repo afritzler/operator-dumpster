@@ -1,6 +1,6 @@
 module github.com/afritzler/operator-dumpster
 
-go 1.20
+go 1.21
 
 require (
 	github.com/onmetal/controller-utils v0.8.3
