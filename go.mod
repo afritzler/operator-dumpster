@@ -7,7 +7,7 @@ toolchain go1.22.2
 require (
 	github.com/onmetal/controller-utils v0.8.3
 	github.com/onsi/ginkgo/v2 v2.21.0
-	github.com/onsi/gomega v1.35.0
+	github.com/onsi/gomega v1.35.1
 	github.com/robfig/cron v1.2.0
 	k8s.io/api v0.31.2
 	k8s.io/apimachinery v0.31.2
